@@ -1,4 +1,4 @@
-(ns problems)
+(ns solutions)
 
 
 ;; http://www.4clojure.com/problem/16

@@ -1,6 +1,12 @@
 (ns solutions)
 
 
+;; collected in one file after solving most of the problems
+;; in 4clojure. Done in order "Times Solved" by starting with
+;; the most-often solved problem and moving down towards less-
+;; often solved problems.
+
+
 ;; http://www.4clojure.com/problem/16
 ;; Hello World
 ;; Write a function which returns a personalized greeting.
@@ -82,3 +88,42 @@
 
         :else
         (recur (rest more))))
+
+
+;; http://www.4clojure.com/problem/72
+;; Rearranging Code: ->>
+;; The ->> macro threads an expression x through a variable number of forms.
+;; First, x is inserted as the last item in the first form, making a list of it
+;; if it is not a list already. Then the first form is inserted as the last item
+;; in the second form, making a list of that form if necessary. This process
+;; continues for all the forms. Using ->> can sometimes make your code more
+;; readable.
+#(reduce + %)
+
+
+;; http://www.4clojure.com/problem/29
+;; Get the Caps
+;; Write a function which takes a string and returns a new string containing
+;; only the capital letters.
+(fn
+  [input]
+  (apply str (re-seq #"[A-Z]" input)))
+
+
+;; http://www.4clojure.com/problem/134
+;; A nil key
+;; Write a function which, given a key and map, returns true
+;; iff (http://en.wikipedia.org/wiki/If_and_only_if) the map contains an entry
+;; with that key and its value is nil.
+(fn [k coll] (and (contains? coll k) (nil? (k coll))))
+
+
+;; http://www.4clojure.com/problem/32
+;; Duplicate a Sequence
+;; Write a function which duplicates each element of a sequence.
+(fn dup-seq
+  ([input] (dup-seq input []))
+  ([input accum]
+   (if (empty? input)
+     accum
+     (recur (rest input) (conj accum (first input) (first input))))))

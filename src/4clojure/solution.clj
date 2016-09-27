@@ -1,5 +1,7 @@
 (ns solutions)
 
+;; 4clojure id: cliffmcintosh
+
 
 ;; collected in one file after solving most of the problems
 ;; in 4clojure. Done in order "Times Solved" by starting with
@@ -191,3 +193,85 @@
      accum
      (recur (rest input)
             (apply conj accum (repeat num-times (first input))) num-times))))
+
+
+;; http://www.4clojure.com/problem/52
+;; Intro to Destructuring
+;; Let bindings and function parameter lists support destructuring.
+(conj [] c e)
+
+
+;; http://www.4clojure.com/problem/40
+;; Interpose a Seq
+;; Write a function which separates the items of a sequence by an arbitrary
+;; value.
+(fn my-interpose
+  [interposer coll]
+  (loop [x interposer
+         xs coll
+         accum []]
+    (cond
+      (empty? xs) accum
+      (= (count xs) 1) (conj accum (first xs))
+      :else (recur x (rest xs) (conj accum (first xs) x)))))
+
+
+;; http://www.4clojure.com/problem/31
+;; Pack a Sequence
+;; Write a function which packs consecutive duplicates into sub-lists.
+(fn [input]
+  (partition-by identity input))
+
+
+;; http://www.4clojure.com/problem/156
+;; When retrieving values from a map, you can specify default values in case the
+;; key is not found:
+;;
+;; (= 2 (:foo {:bar 0, :baz 1} 2))
+;;
+;; However, what if you want the map itself to contain the default values?
+;; Write a function which takes a default value and a sequence of keys and
+;; constructs a map.
+(fn map-defaults
+  [value the-seq]
+  (zipmap the-seq (take (count the-seq) (iterate identity value))))
+
+
+;; http://www.4clojure.com/problem/41
+;; Drop Every Nth Item
+;; Write a function which drops every Nth item from a sequence.
+(fn drop-every-nth
+  [original index]
+  (let [indexed-items (->> original
+                           (map-indexed vector)
+                           (map #(conj [] (inc (first %)) (second %))))]
+    (->> indexed-items
+         (filter (fn [input]
+                   (not= 0 (rem (first input) index))))
+         (reduce #(conj %1 (take-last 1 %2)) [])
+         (flatten))))
+
+
+;; http://www.4clojure.com/problem/49
+;; Split a sequence
+;; Write a function which will split a sequence into two parts.
+#(vector (take %1 %2) (drop %1 %2))
+
+
+;; http://www.4clojure.com/problem/46
+;; Flipping out
+;; Write a higher-order function which flips the order of the arguments of an
+;; input function.
+(fn [f] #(f %2 %1))
+
+
+;; http://www.4clojure.com/problem/83
+;; A Half-Truth
+;; Write a function which takes a variable number of booleans. Your function
+;; should return true if some of the parameters are true, but not all of the
+;; parameters are true. Otherwise your function should return false.
+(fn half-truth
+  [& xs]
+  (if (and (some true? xs) (some false? xs))
+    true
+    false))

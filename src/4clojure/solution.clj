@@ -127,3 +127,67 @@
    (if (empty? input)
      accum
      (recur (rest input) (conj accum (first input) (first input))))))
+
+
+;; http://www.4clojure.com/problem/162
+;; Implement range
+;; Write a function which creates a list of all integers in a given range.
+(fn my-range
+  ([start end] (my-range start end []))
+  ([start end accum]
+   (if (>= start end)
+     accum
+     (recur (inc start) end (conj accum start)))))
+
+
+;; http://www.4clojure.com/problem/30
+;; Compress a Sequence
+;; Write a function which removes consecutive duplicates from a sequence.
+(fn compress
+  [input]
+  (map first (partition-by identity input)))
+
+
+;; http://www.4clojure.com/problem/42
+;; Factorial Fun
+;; Write a function which calculates factorials.
+(fn factorial
+  [x]
+  (reduce * (range 1 (+ x 1))))
+
+
+;; http://www.4clojure.com/problem/39
+;; Interleave Two Seqs
+;; Write a function which takes two sequences and returns the first item
+;; from each, then the second item from each, then the third, etc.
+(fn my-interleave
+  [x y]
+  (flatten (map #(conj [] %1 %2) x y)))
+
+
+;; http://www.4clojure.com/problem/28
+;; Flatten a Sequence
+;; Write a function which flattens a sequence.
+(fn my-flatten
+  [coll]
+  (let [left (first coll)
+        right (next coll)]
+    (concat
+     (if (sequential? left)
+       (my-flatten left)
+       [left])
+     (when (sequential? right)
+       (my-flatten right)))))
+
+
+;; http://www.4clojure.com/problem/33
+;; Replicate a Sequence
+;; Write a function which replicates each element of a sequence a variable
+;; number of times.
+(fn rep-seq
+  ([input num-times] (rep-seq input [] num-times))
+  ([input accum num-times]
+   (if (empty? input)
+     accum
+     (recur (rest input)
+            (apply conj accum (repeat num-times (first input))) num-times))))

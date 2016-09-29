@@ -275,3 +275,86 @@
   (if (and (some true? xs) (some false? xs))
     true
     false))
+
+
+;; http://www.4clojure.com/problem/61
+;; Map Construction
+;; Write a function which takes a vector of keys and a vector of values and
+;; constructs a map from them.
+(fn construct-map
+  [x y]
+  (apply merge (map #(assoc {} %1 %2) x y)))
+
+
+;; http://www.4clojure.com/problem/66
+;; Greatest Common Divisor
+;; Given two integers, write a function which returns the greatest common
+;; divisor.
+(fn divisor
+  [x y]
+  (let [smaller
+        (if (< x y) x y)
+        larger
+        (if (= x smaller) y x)
+        largest-possible-divisor
+        (if (>= (/ larger smaller) 2)
+          smaller
+          (if (> smaller 0) (int (float (/ smaller 2))) 0))
+        possibles
+        (reverse (range (inc largest-possible-divisor)))
+        finder
+        (fn [l s candidates]
+          (let [to-check (first candidates)
+                more (rest candidates)]
+            (if (and (zero? (rem l to-check))
+                     (zero? (rem s to-check)))
+              to-check
+              (recur l s more))))]
+    (finder larger smaller possibles)))
+
+
+;; http://www.4clojure.com/problem/44
+;; Rotate Sequence
+;; Write a function which can rotate a sequence in either direction.
+(fn rotate-sequence
+  [pivot coll]
+  (let [length (count coll)
+        positive-pivot? (> pivot 0)
+        new-pivot (if positive-pivot?
+                    (if (>= length pivot) pivot (- pivot length))
+                    (if (>= length (Math/abs pivot))
+                      (+ length pivot)
+                      (+ pivot (* 2 length))))]
+    (concat (drop new-pivot coll) (take new-pivot coll))))
+
+
+;; http://www.4clojure.com/problem/43
+;; Reverse Interleave
+;; Write a function which reverses the interleave process into x number of
+;; subsequences.
+(fn rev-interleave
+  [xs point]
+  (let [partitioned (partition point xs)
+        helper (fn [coll accum]
+                 (if (some empty? coll)
+                   accum
+                   (recur (map rest coll) (conj accum (map first coll)))))]
+    (helper partitioned [])))
+
+
+;; http://www.4clojure.com/problem/50
+;; Split by Type
+;; Write a function which takes a sequence consisting of items with different
+;; types and splits them up into a set of homogeneous sub-sequences. The
+;; internal order of each sub-sequence should be maintained, but the
+;; sub-sequences themselves can be returned in any order (this is why 'set' is
+;; used in the test cases).
+(fn split-by-type [xs]
+  (set (map second (group-by class xs))))
+
+
+;; http://www.4clojure.com/problem/81
+;; Set Intersection
+;; Write a function which returns the intersection of two sets. The intersection
+;; is the sub-set of items that each set has in common.
+(fn [xs ys] (into #{} (filter #(contains? xs %) ys)))

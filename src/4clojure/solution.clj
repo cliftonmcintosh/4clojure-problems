@@ -186,14 +186,10 @@
 ;; Replicate a Sequence
 ;; Write a function which replicates each element of a sequence a variable
 ;; number of times.
-(fn rep-seq
-  ([input num-times] (rep-seq input [] num-times))
-  ([input accum num-times]
-   (if (empty? input)
-     accum
-     (recur (rest input)
-            (apply conj accum (repeat num-times (first input))) num-times))))
-
+(fn replicate' [coll x]
+  (reduce (fn [a c] (apply conj a (repeat x c)))
+          []
+          coll))
 
 ;; http://www.4clojure.com/problem/52
 ;; Intro to Destructuring

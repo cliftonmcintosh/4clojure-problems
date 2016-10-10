@@ -354,3 +354,94 @@
 ;; Write a function which returns the intersection of two sets. The intersection
 ;; is the sub-set of items that each set has in common.
 (fn [xs ys] (into #{} (filter #(contains? xs %) ys)))
+
+
+;; http://www.4clojure.com/problem/166
+;; Comparisons
+;; For any orderable data type it's possible to derive all of the basic
+;; comparison operations (<, ≤, =, ≠, ≥, and >) from a single operation
+;; (any operator but = or ≠ will work). Write a function that takes three
+;; arguments, a less than operator for the data and two items to compare. The
+;; function should return a keyword describing the relationship between the two
+;; items. The keywords for the relationship between x and y are as follows:
+;; x = y → :eq
+;; x > y → :gt
+;; x < y → :lt
+(fn comparison [op x y]
+  (cond
+    (and (not (op x y)) (not (op y x))) :eq
+    (not (op x y)) :gt
+    :else :lt))
+
+
+;; http://www.4clojure.com/problem/62
+;; Re-implement Iterate
+;; Given a side-effect free function f and an initial value x write a function
+;; which returns an infinite lazy sequence of x, (f x), (f (f x)),
+;; (f (f (f x))), etc.
+(fn my-iter [f x] (lazy-seq (cons x (my-iter f (f x)))))
+
+
+;; http://www.4clojure.com/problem/107
+;; Simple closures
+;; Lexical scope and first-class functions are two of the most basic building
+;; blocks of a functional language like Cloture. When you combine the two
+;; together, you get something very powerful called lexical closures.
+;; With these, you can exercise a great deal of control over the lifetime of
+;; your local bindings, saving their values for use later, long after the code
+;; you're running now has finished
+;;
+;; It can be hard to follow in the abstract, so let's build a simple closure.
+;; Given a positive integer n, return a function (f x) which computes xn.
+;; Observe that the effect of this is to preserve the value of n for use outside
+;; the scope in which it is defined.
+(fn power [n]
+  (fn [x]
+    (reduce * (repeat n x))))
+
+
+;; http://www.4clojure.com/problem/90
+;; Write a function which calculates the Cartesian product of two sets.
+;; http://en.wikipedia.org/wiki/Cartesian_product
+(fn cart [x y]
+  (set (for [value x
+             suit y]
+         [value suit])))
+
+
+;; http://www.4clojure.com/problem/99
+;; Product Digits
+;; Write a function which multiplies two numbers and returns the result as a
+;; sequence of its digits.
+(fn product-digits
+  [x y]
+  (->> (* x y)
+       str
+       seq
+       (map str)
+       (map read-string)))
+
+
+;; http://www.4clojure.com/problem/63
+;; Group a Sequence
+;; Given a function f and a sequence s, write a function which returns a map.
+;; The keys should be the values of f applied to each item in s. The value at
+;; each key should be a vector of corresponding items in the order they appear
+;; in s.
+(fn grpr-2 [f s]
+  (reduce (fn [accum item]
+            (let [r (f item)
+                  items-for-key (get accum r)]
+              (assoc accum r (if items-for-key
+                               (conj items-for-key item) [item])))) {} s))
+
+
+;; http://www.4clojure.com/problem/88
+;; Symmetric Difference
+;; Write a function which returns the symmetric difference of two sets. The
+;; symmetric difference is the set of items belonging to one but not both of the
+;; two sets.
+(fn diffs [s1 s2]
+  (set (concat
+        (clojure.set/difference s1 s2)
+        (clojure.set/difference s2 s1))))

@@ -511,3 +511,71 @@
 (fn my-map [f xs]
   (if (empty? xs) xs
       (cons (f (first xs)) (lazy-seq (my-map f (rest xs))))))
+
+
+;; http://www.4clojure.com/problem/95
+;; To Tree, or not to Tree
+;; Write a predicate which checks whether or not a given sequence represents a
+;; binary tree. Each node in the tree must have a value, a left child, and a
+;; right child.
+(fn is-tree? [xs]
+  (and (sequential? xs)
+       (= 3 (count xs))
+       (not (sequential? (first xs)))
+       (not (nil? (first xs)))
+       (or (nil? (second xs)) (is-tree? (second xs)))
+       (or (nil? (last xs)) (is-tree? (last xs)))))
+
+
+;; http://www.4clojure.com/problem/120
+;; Sum of square of digits
+;; Write a function which takes a collection of integers as an argument. Return
+;; the count of how many elements are smaller than the sum of their squared
+;; component digits. For example: 10 is larger than 1 squared plus 0 squared;
+;; whereas 15 is smaller than 1 squared plus 5 squared.
+(fn sum-of-squares [coll]
+  (letfn [(component-squares [a-num]
+            (reduce (fn [c n] (+ c (* n n)))
+                    0 (map #(Character/getNumericValue %) (str a-num))))
+          (accum-smallers [c n]
+            (if (< n (component-squares n))
+              (inc c)
+              c))]
+    (reduce accum-smallers
+            0 coll)))
+
+
+;; http://www.4clojure.com/problem/128
+;; Recognize Playing Cards
+;; A standard American deck of playing cards has four suits - spades, hearts,
+;; diamonds, and clubs - and thirteen cards in each suit. Two is the lowest
+;; rank, followed by other integers up to ten; then the jack, queen, king, and
+;; ace.
+;;
+;; It's convenient for humans to represent these cards as suit/rank pairs, such
+;; as H5 or DQ: the heart five and diamond queen respectively. But these forms
+;; are not convenient for programmers, so to write a card game you need some way
+;; to parse an input string into meaningful components. For purposes of
+;; determining rank, we will define the cards to be valued from 0 (the two) to
+;; 12 (the ace)
+;;
+;; Write a function which converts (for example) the string "SJ" into a map of
+;; {:suit :spade, :rank 9}. A ten will always be represented with the single
+;; character "T", rather than the two characters "10".
+(fn card [code]
+  (let [suits {\C :club, \D :diamond, \H :heart, \S :spade}
+        ranks {\2 0, \3 1, \4 2, \5 3, \6 4, \7 5,\8 6,
+               \9 7, \T 8, \J 9, \Q 10, \K 11, \A 12}]
+    {:suit (get suits (first code)) :rank (get ranks (second code))}))
+
+
+;; http://www.4clojure.com/problem/100
+;; Least Common Multiple
+;; Write a function which calculates the least common multiple. Your function
+;; should accept a variable number of positive integers or ratios.
+(fn l-c-m [x y & zs]
+  (first
+   (filter (fn [a]
+             (every? zero? (map (fn [b] (rem a b))
+                                (cons y (into [] zs)))))
+           (lazy-seq (map (partial * x) (rest (range)))))))

@@ -445,3 +445,69 @@
   (set (concat
         (clojure.set/difference s1 s2)
         (clojure.set/difference s2 s1))))
+
+
+;; http://www.4clojure.com/problem/143
+;; dot product
+;; Create a function that computes the dot product of two sequences. You may
+;; assume that the vectors will have the same length.
+(fn dot [xs ys]
+  (reduce + (map * xs ys)))
+
+
+;; http://www.4clojure.com/problem/122
+;; Read a binary number
+;; Convert a binary number, provided in the form of a string, to its numerical
+;; value.
+#(Integer/parseInt % 2)
+
+;; http://www.4clojure.com/problem/135
+;; Infix Calculator
+;; Your friend Joe is always whining about Lisps using the prefix notation for
+;; math. Show him how you could easily write a function that does math using the
+;; infix notation. Is your favorite language that flexible, Joe? Write a
+;; function that accepts a variable length mathematical expression consisting of
+;; numbers and the operations +, -, *, and /. Assume a simple calculator that
+;; does not do precedence and instead just calculates left to right.
+(fn nfix [& [seed & coll]]
+  (reduce (fn [v [op numb]]
+            (op v numb))
+          seed (partition 2 coll)))
+
+
+;; http://www.4clojure.com/problem/157
+;; Indexing Sequences
+;; Transform a sequence into a sequence of pairs containing the original
+;; elements along with their index.
+(fn idx-seq [coll]
+  (map-indexed (fn [idx item] [item idx]) coll))
+
+
+;; http://www.4clojure.com/problem/97
+;; Pascal's Triangle
+;; http://en.wikipedia.org/wiki/Pascal%27s_triangle
+;; Pascal's triangle is a triangle of numbers computed using the following
+;; rules:
+;;
+;; - The first row is 1.
+;; - Each successive row is computed by adding together adjacent numbers in the
+;; row above, and adding a 1 to the beginning and end of the row.
+;;
+;; Write a function which returns the nth row of Pascal's Triangle.
+(fn pascal [y]
+  (let [n (dec y)
+        factorial (fn [x] (reduce * (range 1 (inc x))))
+        n-choose-r (fn [r] (/ (factorial n)
+                              (* (factorial r)
+                                 (factorial (- n r)))))]
+    (conj (into [] (map n-choose-r (range n))) 1)))
+
+
+;; http://www.4clojure.com/problem/118
+;; Re-implement Map
+;; Map is one of the core elements of a functional programming language. Given a
+;; function f and an input sequence s, return a lazy sequence of (f x) for each
+;; element x in s.
+(fn my-map [f xs]
+  (if (empty? xs) xs
+      (cons (f (first xs)) (lazy-seq (my-map f (rest xs))))))

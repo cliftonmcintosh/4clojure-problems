@@ -235,17 +235,9 @@
 ;; http://www.4clojure.com/problem/41
 ;; Drop Every Nth Item
 ;; Write a function which drops every Nth item from a sequence.
-(fn drop-every-nth
-  [original index]
-  (let [indexed-items (->> original
-                           (map-indexed vector)
-                           (map #(conj [] (inc (first %)) (second %))))]
-    (->> indexed-items
-         (filter (fn [input]
-                   (not= 0 (rem (first input) index))))
-         (reduce #(conj %1 (take-last 1 %2)) [])
-         (flatten))))
-
+(fn drop-nth [coll n]
+  (mapcat (fn [item] (if (= n (count item)) (butlast item) item))
+          (partition-all n coll)))
 
 ;; http://www.4clojure.com/problem/49
 ;; Split a sequence

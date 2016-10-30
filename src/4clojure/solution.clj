@@ -187,9 +187,8 @@
 ;; Write a function which replicates each element of a sequence a variable
 ;; number of times.
 (fn replicate' [coll x]
-  (reduce (fn [a c] (apply conj a (repeat x c)))
-          []
-          coll))
+  (reduce (fn [a c] (concat a (repeat x c))) [] coll))
+
 
 ;; http://www.4clojure.com/problem/52
 ;; Intro to Destructuring

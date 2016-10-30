@@ -572,6 +572,21 @@
            (lazy-seq (map (partial * x) (rest (range)))))))
 
 
+;; http://www.4clojure.com/problem/74
+;; Filter Perfect Squares
+;; Given a string of comma separated integers, write a function which returns a
+;; new comma separated string that only contains the numbers which are perfect
+;; squares.
+(fn perfect-squares [s]
+  (->> (clojure.string/split s #",")
+       (map read-string)
+       (filter #(zero?
+                 (compare (Math/sqrt %)
+                          (int (Math/sqrt %)))))
+       (map str)
+       (clojure.string/join ",")))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that

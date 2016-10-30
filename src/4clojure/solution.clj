@@ -587,6 +587,64 @@
        (clojure.string/join ",")))
 
 
+;; http://www.4clojure.com/problem/77
+;; Anagram Finder
+;; Write a function which finds all the anagrams in a vector of words. A word x
+;; is an anagram of word y if all the letters in x can be rearranged in a
+;; different order to form y. Your function should return a set of sets, where
+;; each sub-set is a group of words which are anagrams of each other. Each
+;; sub-set should have at least two words. Words without any anagrams should not
+;; be included in the result.
+(fn anagram-finder' [words]
+  (->> words
+       (group-by sort)
+       (map (comp set last))
+       (filter (comp (partial < 1) count))
+       set))
+
+;; http://www.4clojure.com/problem/80
+;; Perfect Numbers
+;;A number is "perfect" if the sum of its divisors equal the number itself. 6 is
+;; a perfect number because 1+2+3=6. Write a function which returns true for
+;; perfect numbers and false otherwise.
+(fn perfect-numbers' [x]
+  (->> x
+       (range 1)
+       (filter (comp integer? (partial / x)))
+       (reduce +)
+       (= x)))
+
+
+;; http://www.4clojure.com/problem/60
+;; Sequence Reductions
+;; Write a function which behaves like reduce, but returns each intermediate
+;; value of the reduction. Your function must accept either two or three
+;; arguments, and the return sequence must be lazy.
+(fn reductions'
+  ([f coll] (reductions' f (f (first coll)) (rest coll)))
+  ([f v [h & t]]
+   (lazy-seq (cons v (if (seq t)
+                       (reductions' f (f v h) t)
+                       [(f v h)])))))
+
+
+;; http://www.4clojure.com/problem/69
+;; Merge with a Function
+;; Write a function which takes a function f and a variable number of maps. Your
+;; function should return a map that consists of the rest of the maps conj-ed
+;; onto the first. If a key occurs in more than one map, the mapping(s) from the
+;; latter (left-to-right) should be combined with the mapping in the result by
+;; calling (f val-in-result val-in-latter)
+(fn mw-2 [f & maps]
+  (let [r (fn [i a]
+            (reduce-kv
+             (fn [m k v]
+               (let [existing (get m k)]
+                 (assoc m k (if existing (f existing v) v))))
+             i a))]
+    (reduce (fn [v item] (r v item)) (first maps) (rest maps))))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that

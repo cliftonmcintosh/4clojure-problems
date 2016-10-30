@@ -570,3 +570,28 @@
              (every? zero? (map (fn [b] (rem a b))
                                 (cons y (into [] zs)))))
            (lazy-seq (map (partial * x) (rest (range)))))))
+
+
+;; http://www.4clojure.com/problem/121
+;; Universal Computation Engine
+;; Given a mathematical formula in prefix notation, return a function that
+;; calculates the value of the formula. The formula can contain nested
+;; calculations using the four basic mathematical operators, numeric constants,
+;; and symbols representing variables. The returned function has to accept a
+;; single parameter containing the map of variable names to their values.
+(fn uce' [fmla]
+  (let [ops
+        {'/ / '* * '+ + '- -}
+
+        uce-fn
+        (fn engine [expression substitutes]
+          (let [operator (ops (first expression))]
+            (apply operator (reduce (fn [acc v]
+                                      (conj acc
+                                            (or (substitutes v)
+                                                (if (seq? v)
+                                                  (engine v substitutes)
+                                                  v))))
+                                    [] (rest expression)))))]
+    (fn [subs']
+      (uce-fn fmla subs'))))

@@ -645,6 +645,73 @@
     (reduce (fn [v item] (r v item)) (first maps) (rest maps))))
 
 
+;; http://www.4clojure.com/problem/147
+;; Pascal's Trapezoid
+;; Write a function that, for any given input vector of numbers, returns an
+;; infinite lazy sequence of vectors, where each next one is constructed from
+;; the previous following the rules used in Pascal's Triangle. For example, for
+;; [3 1 2], the next row is [3 4 3 2].
+;; Beware of arithmetic overflow! In clojure (since version 1.3 in 2011), if you
+;; use an arithmetic operator like + and the result is too large to fit into a
+;; 64-bit integer, an exception is thrown. You can use +' to indicate that you
+;; would rather overflow into Clojure's slower, arbitrary-precision bigint.
+(fn p' [input]
+  (lazy-seq
+   (cons input (p' (mapv #(apply +' %)
+                         (cons (list (first input))
+                               (partition-all 2 1 input)))))))
+
+
+;; http://www.4clojure.com/problem/96
+;; Beauty is Symmetry
+;; Let us define a binary tree as "symmetric" if the left half of the tree is
+;; the mirror image of the right half of the tree. Write a predicate to
+;; determine whether or not a given binary tree is symmetric. (see To Tree, or
+;; not to Tree for a reminder on the tree representation we're using).
+(fn sym [[root left right]]
+  (letfn [(mirror? [l r]
+            (or (every? nil? [l r])
+                (and (= (first l) (first r))
+                     (mirror? (second l) (last r))
+                     (mirror? (last l) (second r)))))]
+    (mirror? left right)))
+
+
+;; http://www.4clojure.com/problem/102
+;; intoCamelCase
+;; When working with java, you often need to create an object with
+;; fieldsLikeThis, but you'd rather work with a hashmap that has :keys-like-this
+;; until it's time to convert. Write a function which takes lower-case
+;; hyphen-separated strings and converts them to camel-case strings.
+(fn camel-case [word]
+  (let [broken (clojure.string/split word #"-")
+        start (first broken)
+        others (rest broken)]
+    (str start
+         (clojure.string/join "" (map clojure.string/capitalize others)))))
+
+
+;; http://www.4clojure.com/problem/146
+;; Trees into tables
+;; Because Clojure's for macro allows you to "walk" over multiple sequences in a
+;; nested fashion, it is excellent for transforming all sorts of sequences. If
+;; you don't want a sequence as your final output (say you want a map), you are
+;; often still best-off using for, because you can produce a sequence and feed
+;; it into a map, for example.
+
+;; For this problem, your goal is to "flatten" a map of hashmaps. Each key in
+;; your output map should be the "path" that you would have to take in the
+;; original map to get to a value, so for example {1 {2 3}} should result in
+;; {[1 2] 3}. You only need to flatten one level of maps: if one of the values
+;; is a map, just leave it alone.
+(fn tree-to-table [m]
+  (apply merge (for [i m]
+                 (reduce (fn [acc item]
+                           (assoc acc [(first i) (first item)] (second item)))
+                         {}
+                         (second i)))))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that

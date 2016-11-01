@@ -712,6 +712,61 @@
                          (second i)))))
 
 
+;; http://www.4clojure.com/problem/153
+;; Pairwise Disjoint Sets
+;; Given a set of sets, create a function which returns true if no two of those
+;; sets have any elements in common and false otherwise. Some of the test cases
+;; are a bit tricky, so pay a little more attention to them.
+(fn pairwise-disjoint?' [ss]
+  (letfn [(all-pairs' [coll]
+            (when-let [s (next coll)]
+              (lazy-cat (for [y s] [(first coll) y])
+                        (all-pairs' s))))]
+    (->> (all-pairs' ss)
+         (map (partial apply clojure.set/intersection))
+         (not-any? seq))))
+
+
+;; http://www.4clojure.com/problem/73
+;; Analyze a Tic-Tac-Toe Board
+;; A tic-tac-toe board is represented by a two dimensional vector. X is
+;; represented by :x, O is represented by :o, and empty is represented by :e. A
+;; player wins by placing three Xs or three Os in a horizontal, vertical, or
+;; diagonal row. Write a function which analyzes a tic-tac-toe board and returns
+;; :x if X has won, :o if O has won, and nil if neither player has won.
+(fn ttt-winner [board]
+  (let [filter-fn (fn [rows] (first (filter #(and (= 1 (count %))
+                                                  (not= (first %) :e))
+                                            (map distinct rows))))
+        h (filter-fn board)
+        v (filter-fn (partition 3 (for [x (range 3)
+                                        row board]
+                                    (nth row x))))
+        d (filter-fn [[(nth (nth board 0) 0)
+                       (nth (nth board 1) 1)
+                       (nth (nth board 2) 2)]
+                      [(nth (nth board 0) 2)
+                       (nth (nth board 1) 1)
+                       (nth (nth board 2) 0)]])]
+    (first (or h v d))))
+
+;; http://www.4clojure.com/problem/75
+;; Euler's Totient Function
+;; Two numbers are coprime if their greatest common divisor equals 1. Euler's
+;; totient function f(x) is defined as the number of positive integers less than
+;; x which are coprime to x. The special case f(1) equals 1. Write a function
+;; which calculates Euler's totient function.
+(fn totient [n]
+  (letfn [(gcd [x y] (if (zero? y)
+                       x
+                       (recur y (rem x y))))]
+    (count (if (= n 1)
+             '(1)
+             (filter
+              (comp (partial = 1) (partial gcd n))
+              (range 1 n))))))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that

@@ -829,6 +829,56 @@
           superset))
 
 
+;; http://www.4clojure.com/problem/98
+;; Equivalence Classes
+;; A function f defined on a domain D induces an equivalence relation on D, as
+;; follows: a is equivalent to b with respect to f if and only if (f a) is equal
+;; to (f b). Write a function with arguments f and D that computes the
+;; equivalence classes of D with respect to f.
+(fn equiv-classes [func domain]
+  (set
+   (map set
+        (vals (reduce (fn [accum item]
+                        (merge-with concat
+                                    accum
+                                    {(func item) [item]}))
+                      {}
+                      domain)))))
+
+
+;; http://www.4clojure.com/problem/105
+;; Identify keys and values
+;; Given an input sequence of keywords and numbers, create a map such that each
+;; key in the map is a keyword, and the value is a sequence of all the numbers
+;; (if any) between it and the next keyword in the sequence.
+(fn idkv [coll]
+  (or (->> coll
+           (partition-by keyword?)
+           (partition 2)
+           (map #(assoc
+                  (into {} (for [x (butlast (first %))] [x []]))
+                  (last (first %)) (second %)))
+           (apply merge))
+      {}))
+
+
+;; http://www.4clojure.com/problem/137
+;; Digits and bases
+;; Write a function which returns a sequence of digits of a non-negative number
+;; (first argument) in numerical system with an arbitrary base (second
+;; argument). Digits should be represented with their integer values, e.g. 15
+;; would be [1 5] in base 10, [1 1 1 1] in base 2 and [15] in base 16.
+(fn digits-and-bases'
+  ([num base] (digits-and-bases' num base []))
+  ([num base accum]
+   (let [result (int (/ num base))
+         remainder (rem num base)]
+     (if (< result base)
+       (if (every? zero? [result remainder])
+         (cons result accum)
+         (concat [result remainder] accum))
+       (recur result base (cons remainder accum))))))
+
 
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine

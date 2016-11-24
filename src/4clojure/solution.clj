@@ -880,6 +880,96 @@
        (recur result base (cons remainder accum))))))
 
 
+;; http://www.4clojure.com/problem/144
+;; Oscilrate
+;; Write an oscillating iterate: a function that takes an initial value and a
+;; variable number of functions. It should return a lazy sequence of the
+;; functions applied to the value in order, restarting from the first function
+;; after it hits the end.
+(fn oscilrate [num & funcs]
+  (reductions (fn [n f] (f n)) num (cycle funcs)))
+
+
+;; http://www.4clojure.com/problem/110
+;; Sequence of pronunciations
+;; Write a function that returns a lazy sequence of "pronunciations" of a
+;; sequence of numbers. A pronunciation of each element in the sequence consists
+;; of the number of repeating identical numbers and the number itself. For
+;; example, [1 1] is pronounced as [2 1] ("two ones"), which in turn is
+;; pronounced as [1 2 1 1] ("one two, one one").
+;; Your function should accept an initial sequence of numbers, and return an
+;; infinite lazy sequence of pronunciations, each element being a pronunciation
+;; of the previous element.
+(fn seq-pron [coll]
+  (let [pronouncer (fn [c] (reduce
+                            (fn [a c]
+                              (conj a (count c) (first c)))
+                            []
+                            (partition-by identity c)))
+        seed (pronouncer coll)]
+    (iterate pronouncer seed)))
+
+
+;; http://www.4clojure.com/problem/158
+;; Write a function that accepts a curried function of unknown arity n. Return
+;; an equivalent function of n arguments.
+(fn decurry [fns]
+  (fn [& args]
+    (reduce (fn [accum item] (accum item))
+            (fns (first args)) (rest args))))
+
+
+;; http://www.4clojure.com/problem/108
+;; Lazy Searching
+;; Given any number of sequences, each sorted from smallest to largest, find the
+;; smallest single number which appears in all of the sequences. The sequences
+;; may be infinite, so be careful to search lazily.
+(fn lazy-search [& colls]
+  (let [all-firsts (map first colls)
+        min-first (apply min all-firsts)]
+    (if (apply = all-firsts)
+      min-first
+      (recur (map (fn [coll] (drop-while #(= min-first %) coll)) colls)))))
+
+
+;; http://www.4clojure.com/problem/93
+;; Partially Flatten a Sequence
+;; Write a function which flattens any nested combination of sequential things
+;; (lists, vectors, etc.), but maintains the lowest level sequential items. The
+;; result should be a sequence of sequences with only one level of nesting.
+(fn pflatten [s]
+  (let [c (atom [])
+        accum (fn coll-fn [xs]
+                (if-not (coll? (first xs))
+                  (swap! c conj xs)
+                  (do
+                    (coll-fn (first xs))
+                    (when (seq (rest xs)) (coll-fn (rest xs))))))]
+    (accum s)
+    @c))
+
+
+;; http://www.4clojure.com/problem/114
+;; Global take-while
+;; take-while is great for filtering sequences, but it limited: you can only
+;; examine a single item of the sequence at a time. What if you need to keep
+;; track of some state as you go over the sequence?
+
+;; Write a function which accepts an integer n, a predicate p, and a sequence.
+;; It should return a lazy sequence of items in the list up to, but not
+;; including, the nth item that satisfies the predicate.
+(fn g-take-while [n pred xs]
+  (loop [y n
+         res []
+         cs xs]
+    (let [z (if (pred (first cs))
+              (dec y)
+              y)]
+      (if (zero? z)
+        res
+        (recur z (conj res (first cs)) (rest cs))))))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that

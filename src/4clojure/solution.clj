@@ -30,13 +30,8 @@
 ;; http://www.4clojure.com/problem/21
 ;; Nth Element
 ;; Write a function which returns the Nth element from a sequence.
-(fn
-  [coll index]
-  (loop [remaining coll
-         collected []]
-    (if (= (count collected) index)
-      (first remaining)
-      (recur (rest remaining) (conj collected (first remaining))))))
+(fn [coll n]
+  (last (take (inc n) coll)))
 
 
 ;; http://www.4clojure.com/problem/22

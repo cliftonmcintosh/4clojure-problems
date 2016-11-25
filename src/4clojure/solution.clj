@@ -43,13 +43,11 @@
 ;; http://www.4clojure.com/problem/23
 ;; Reverse a Sequence
 ;; Write a function which reverses a sequence.
-(fn
-  [coll]
-  (loop [remaining coll
-         reversed ()]
-    (if (empty? remaining)
-      reversed
-      (recur (rest remaining) (conj reversed (first remaining))))))
+(fn reverse' [coll]
+  (reduce (fn [accum item]
+            (cons item accum))
+          []
+          coll))
 
 
 ;; http://www.4clojure.com/problem/27
@@ -72,19 +70,8 @@
 ;; Maximum value
 ;; Write a function which takes a variable number of parameters and returns
 ;; the maximum value.
-(fn max-value
-  [& more]
-  (cond (empty? more)
-        more
-
-        (empty? (rest more))
-        (first more)
-
-        (> (first more) (second more))
-        (recur ( cons (first more) (rest (rest more))))
-
-        :else
-        (recur (rest more))))
+(fn max' [& args]
+  (last (sort args)))
 
 
 ;; http://www.4clojure.com/problem/72

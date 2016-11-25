@@ -970,6 +970,126 @@
         (recur z (conj res (first cs)) (rest cs))))))
 
 
+;; http://www.4clojure.com/problem/92
+;; Read Roman numerals
+;; Roman numerals are easy to recognize, but not everyone knows all the rules
+;; necessary to work with them. Write a function to parse a Roman-numeral string
+;; and return the number it represents.
+
+;; You can assume that the input will be well-formed, in upper-case, and follow
+;; the subtractive principle. You don't need to handle any numbers greater than
+;; MMMCMXCIX (3999), the largest number representable with ordinary letters.
+(fn roman [s]
+  (let [combos {"IV" 4 "IX" 9 "XL" 40 "XC" 90 "CD" 400 "CM" 900}
+        singles {"I" 1 "V" 5 "X" 10 "L" 50 "C" 100 "D" 500 "M" 1000}]
+    (loop [arabic 0
+           roamin s]
+      (if-not (seq roamin)
+        arabic
+        (let [n (get combos (clojure.string/join "" (take 2 roamin)))
+              x (if n
+                  (+ arabic n)
+                  (+ arabic (get singles (str (first roamin)))))
+              r (if n
+                  (drop 2 roamin)
+                  (rest roamin))]
+          (recur x (clojure.string/join r)))))))
+
+
+;; http://www.4clojure.com/problem/79
+;; Triangle Minimal Path
+;; Write a function which calculates the sum of the minimal path through a
+;; triangle. The triangle is represented as a collection of vectors. The path
+;; should start at the top of the triangle and move to an adjacent number on the
+;; next row until the bottom of the triangle is reached.
+(fn triangle-minimum-path' [xss]
+  (let [rows (count xss)
+        mpfn (fn mfn [i r accum]
+               (if (zero? (- r rows))
+                 accum
+                 [(mfn i (inc r) (+ accum (nth (nth xss r) i)))
+                  (mfn (inc i) (inc r) (+ accum (nth (nth xss r) (inc i))))]))]
+    (->> (mpfn 0 1 (nth (nth xss 0) 0))
+         flatten
+         (apply min))))
+
+
+;; http://www.4clojure.com/problem/132
+;; Insert between two items
+;; Write a function that takes a two-argument predicate, a value, and a
+;; collection; and returns a new collection where the value is inserted between
+;; every two items that satisfy the predicate.
+(fn insert-between [pred v c]
+  (lazy-seq (cond (empty? (rest c))
+                  c
+                  (pred (first c) (second c))
+                  (cons (first c) (cons v (insert-between pred v (rest c))))
+                  :else
+                  (cons (first c) (insert-between pred v (rest c))))))
+
+
+;; http://www.4clojure.com/problem/104
+;; Write Roman Numerals
+;; This is the inverse of Problem 92, but much easier. Given an integer smaller
+;; than 4000, return the corresponding roman numeral in uppercase, adhering to
+;; the subtractive principle.
+(fn make-roman [arabic]
+  (let [a->r {1 "I" 4 "IV" 5 "V" 9 "IX" 10 "X" 40 "XL" 50 "X" 90 "XC"
+              100 "C" 400 "CD" 500 "D" 900 "CM" 1000 "M"}]
+    (loop [r ""
+           a arabic]
+      (if-not (pos? a)
+        r
+        (let [biggest (apply max (map first (remove #(> (first %) a) a->r)))]
+          (recur (str r (get a->r biggest)) (- a biggest)))))))
+
+
+;; http://www.4clojure.com/problem/103
+;; Generating k-combinations
+;; Given a sequence S consisting of n elements generate all k-combinations of S,
+;; i. e. generate all possible sets consisting of k distinct elements taken from
+;; S. The number of k-combinations for a sequence is equal to the binomial
+;; coefficient.
+(fn kc [n arr]
+  (letfn [(helper [acc res]
+            (if (= n (count acc))
+              acc
+              (map (fn [item]
+                     (helper (conj acc item) (remove #(= % item) res)))
+                   res)))]
+    (set (flatten (helper #{} arr)))))
+
+
+;; http://www.4clojure.com/problem/116
+;; Prime Sandwich
+;; A balanced prime is a prime number which is also the mean of the primes
+;; directly before and after it in the sequence of valid primes. Create a
+;; function which takes an integer n, and returns true if it is a balanced
+;; prime.
+(fn prime-sandwich [c]
+  (let [prime? (fn [n]
+                 (if (even? n) false
+                     (let [root (num (int (Math/sqrt n)))]
+                       (loop [i 3]
+                         (if (> i root) true
+                             (if (zero? (mod n i)) false
+                                 (recur (+ i 2))))))))
+        prime-from (fn [c]
+                     (first (drop-while #(not (prime? %)) c)))
+        previous-prime (->> c
+                            dec
+                            (iterate dec)
+                            prime-from)
+        next-prime (->> c
+                        inc
+                        (iterate inc)
+                        prime-from)]
+    (and (> c 4) (prime? c) (-> previous-prime
+                                (+ next-prime)
+                                (/ 2)
+                                (= c)))))
+
+
 ;; http://www.4clojure.com/problem/121
 ;; Universal Computation Engine
 ;; Given a mathematical formula in prefix notation, return a function that
@@ -993,3 +1113,22 @@
                                     [] (rest expression)))))]
     (fn [subs']
       (uce-fn fmla subs'))))
+
+
+;; http://www.4clojure.com/problem/171
+;; Intervals
+;; Write a function that takes a sequence of integers and returns a sequence of
+;; "intervals". Each interval is a a vector of two integers, start and end, such
+;; that all integers between start and end (inclusive) are contained in the
+;; input sequence.
+(fn intervals' [xs]
+  (->> xs
+       sort
+       distinct
+       (reduce (fn [acc item]
+                 (if (or (empty? acc)
+                         (> (Math/abs (- (first (first acc)) item)) 1))
+                   (cons [item] acc)
+                   (cons (cons item (first acc)) (rest acc)))) [])
+       (map (fn [grp] [(apply min grp) (apply max grp)]))
+       reverse))

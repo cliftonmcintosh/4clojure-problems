@@ -105,15 +105,11 @@
 ;; http://www.4clojure.com/problem/32
 ;; Duplicate a Sequence
 ;; Write a function which duplicates each element of a sequence.
-(fn dup-seq
-  ([input] (dup-seq input []))
-  ([input accum]
-   (if (empty? input)
-     accum
-     (recur (rest input) (conj accum (first input) (first input))))))
+(fn dup-seq [coll]
+  (interleave coll coll))
 
 
-;; http://www.4clojure.com/problem/162
+;; http://www.4clojure.com/problem/34
 ;; Implement range
 ;; Write a function which creates a list of all integers in a given range.
 (fn my-range
@@ -182,15 +178,11 @@
 ;; Interpose a Seq
 ;; Write a function which separates the items of a sequence by an arbitrary
 ;; value.
-(fn my-interpose
-  [interposer coll]
-  (loop [x interposer
-         xs coll
-         accum []]
-    (cond
-      (empty? xs) accum
-      (= (count xs) 1) (conj accum (first xs))
-      :else (recur x (rest xs) (conj accum (first xs) x)))))
+(fn interpose' [interposer coll]
+  (reduce (fn [accum item]
+            (conj accum interposer item))
+          [(first coll)]
+          (rest coll)))
 
 
 ;; http://www.4clojure.com/problem/31

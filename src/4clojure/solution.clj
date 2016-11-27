@@ -1106,3 +1106,29 @@
                    (cons (cons item (first acc)) (rest acc)))) [])
        (map (fn [grp] [(apply min grp) (apply max grp)]))
        reverse))
+
+
+;; http://www.4clojure.com/problem/177
+;; Balancing Brackets
+;; When parsing a snippet of code it's often a good idea to do a sanity check to
+;; see if all the brackets match up. Write a function that takes in a string and
+;; returns truthy if all square [ ] round ( ) and curly { } brackets are properly
+;; paired and legally nested, or returns falsey otherwise.
+(fn balanced? [s]
+  (let [round #"\(\)"
+        square #"\[\]"
+        curly #"\{\}"]
+    (loop [target (apply str (re-seq #"[\{|\}|\(|\)|\[|\]]" s))]
+      (cond (empty? target)
+            true
+
+            (not (or (re-find round target)
+                     (re-find square target)
+                     (re-find curly target)))
+            false
+
+            :else
+            (recur (-> target
+                       (clojure.string/replace round "")
+                       (clojure.string/replace square "")
+                       (clojure.string/replace curly "")))))))

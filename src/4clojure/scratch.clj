@@ -1,19 +1,16 @@
 (ns scratch)
 
+(defn big-divide [n a b]
+  (apply +
+         (filter #(or (zero? (rem % a)) (zero? (rem % b)))
+                 (range n))))
 
-(defn uce' [fmla]
-  (let [ops
-        {'/ / '* * '+ + '- -}
-
-        uce-fn
-        (fn engine [expression substitutes]
-          (let [operator (ops (first expression))]
-            (apply operator (reduce (fn [acc v]
-                                      (conj acc
-                                            (or (substitutes v)
-                                                (if (seq? v)
-                                                  (engine v substitutes)
-                                                  v))))
-                                    [] (rest expression)))))]
-    (fn [subs']
-      (uce-fn fmla subs'))))
+(defn big-divide' [n a b]
+  (letfn [(mplier [constant]
+            (loop [accum []
+                   multiplier 1]
+              (let [mult (* constant multiplier)]
+                (if-not (> n mult)
+                  (set accum)
+                  (recur (conj accum mult) (inc multiplier))))))]
+    (apply + (clojure.set/union (mplier a) (mplier b)))))

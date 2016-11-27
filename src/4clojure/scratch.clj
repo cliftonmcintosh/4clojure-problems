@@ -14,3 +14,27 @@
                   (set accum)
                   (recur (conj accum mult) (inc multiplier))))))]
     (apply + (clojure.set/union (mplier a) (mplier b)))))
+
+
+(defn balanced? [s]
+  (letfn [(balanced-markers? [opener closer match-expr to-evaluate]
+            (loop [target to-evaluate]
+              (println "target: " target)
+              (cond (not (or (clojure.string/includes? target opener)
+                             (clojure.string/includes? target closer)))
+                    true
+
+                    (nil? (re-find match-expr target))
+                    false
+
+                    :else
+                    (recur (clojure.string/replace-first target match-expr "")))))]
+    (every? #(= true %)
+            (for [matchers [{:opener "(" :closer ")" :matcher #"\(\)"}
+                            {:opener "[" :closer "]" :matcher #"\[\]"}
+                            {:opener "{" :closer "}" :matcher #"\{\}"}]]
+              (balanced-markers?
+                (:opener matchers)
+                (:closer matchers)
+                (:matcher matchers)
+                (apply str (re-seq #"[\{|\}|\(|\)|\[|\]]" s)))))))

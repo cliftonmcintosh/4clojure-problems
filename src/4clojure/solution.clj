@@ -1089,6 +1089,21 @@
       (uce-fn fmla subs'))))
 
 
+;; http://www.4clojure.com/problem/148
+;; The Big Divide
+;; Write a function which calculates the sum of all natural numbers under n
+;; (first argument) which are evenly divisible by at least one of a and b
+;; (second and third argument). Numbers a and b are guaranteed to be
+;; coprimes.
+;; Note: Some test cases have a very large n, so the most obvious solution
+;; will exceed the time limit.
+(fn big-divide [n a b]
+  (letfn [(sum-mults [x]
+            (let [y (quot (dec n) x)]
+              (*' x (/ (*' y (inc y)) 2))))]
+    (- (+ (sum-mults a) (sum-mults b)) (sum-mults (* a b)))))
+
+
 ;; http://www.4clojure.com/problem/171
 ;; Intervals
 ;; Write a function that takes a sequence of integers and returns a sequence of

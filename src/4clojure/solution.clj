@@ -1100,8 +1100,13 @@
 (fn big-divide [n a b]
   (letfn [(sum-mults [x]
             (let [y (quot (dec n) x)]
-              (*' x (/ (*' y (inc y)) 2))))]
-    (- (+ (sum-mults a) (sum-mults b)) (sum-mults (* a b)))))
+              (*' x
+                  (/ (*' y
+                         (inc y))
+                     2))))]
+    (- (+ (sum-mults a)
+          (sum-mults b))
+       (sum-mults (* a b)))))
 
 
 ;; http://www.4clojure.com/problem/171

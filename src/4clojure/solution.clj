@@ -1135,20 +1135,13 @@
 ;; returns truthy if all square [ ] round ( ) and curly { } brackets are properly
 ;; paired and legally nested, or returns falsey otherwise.
 (fn balanced? [s]
-  (let [round #"\(\)"
-        square #"\[\]"
-        curly #"\{\}"]
+  (let [paired-pattern #"\(\)|\[\]|\{\}"]
     (loop [target (apply str (re-seq #"[\{|\}|\(|\)|\[|\]]" s))]
       (cond (empty? target)
             true
 
-            (not (or (re-find round target)
-                     (re-find square target)
-                     (re-find curly target)))
+            (not (re-find paired-pattern target))
             false
 
             :else
-            (recur (-> target
-                       (clojure.string/replace round "")
-                       (clojure.string/replace square "")
-                       (clojure.string/replace curly "")))))))
+            (recur (clojure.string/replace target paired-pattern ""))))))

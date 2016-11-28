@@ -1137,11 +1137,6 @@
 (fn balanced? [s]
   (let [paired-pattern #"\(\)|\[\]|\{\}"]
     (loop [target (apply str (re-seq #"[\{|\}|\(|\)|\[|\]]" s))]
-      (cond (empty? target)
-            true
-
-            (not (re-find paired-pattern target))
-            false
-
-            :else
-            (recur (clojure.string/replace target paired-pattern ""))))))
+      (cond (empty? target) true
+            (not (re-find paired-pattern target)) false
+            :else (recur (clojure.string/replace target paired-pattern ""))))))

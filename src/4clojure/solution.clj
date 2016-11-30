@@ -1172,3 +1172,26 @@
         (if (= (count yss) (count new-pairs))
           yss
           (recur new-pairs))))))
+
+
+;; http://www.4clojure.com/problem/131
+;; Sum Some Set Subsets
+;; Given a variable number of sets of integers, create a function which returns
+;; true if all of the sets have a non-empty subset with an equivalent
+;; summation.
+(fn some-sum' [& sets]
+  (letfn [(power-set [superset]
+            (reduce (fn [base-set item]
+                      (into base-set (map
+                                      (fn [s] (conj s item))
+                                      base-set)))
+                    #{#{}}
+                    superset))]
+    (->> (for [s sets] (->> s
+                            power-set
+                            (remove empty?)
+                            (map #(apply + %))
+                            set))
+         (apply clojure.set/intersection)
+         count
+         pos?)))

@@ -1140,3 +1140,35 @@
       (cond (empty? target) true
             (not (re-find paired-pattern target)) false
             :else (recur (clojure.string/replace target paired-pattern ""))))))
+
+
+;; http://www.4clojure.com/problem/solutions/84
+;; Transitive Closure
+;; Write a function which generates the transitive closure of a binary relation.
+;; The relation will be represented as a set of 2 item vectors.
+(fn t-closure' [xss]
+  (letfn [(match-fn [item all]
+            (filter #(= (last item)
+                        (first %))
+                    (clojure.set/difference all #{item})))
+          (pair-fn [target matches]
+            (when (seq matches)
+              (map (fn [i] [(first target) (last i)])
+                   matches)))
+          (reduce-fn [pairs]
+            (reduce (fn [accum item]
+                      (let [matches (match-fn item pairs)
+                            paired (pair-fn item matches)]
+                        (if (seq paired)
+                          (apply conj accum paired)
+                          accum))) [] pairs))
+          (builder [pairs]
+            (-> pairs
+                reduce-fn
+                (concat pairs)
+                set))]
+    (loop [yss xss]
+      (let [new-pairs (builder yss)]
+        (if (= (count yss) (count new-pairs))
+          yss
+          (recur new-pairs))))))

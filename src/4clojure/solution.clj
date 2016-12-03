@@ -1195,3 +1195,22 @@
          (apply clojure.set/intersection)
          count
          pos?)))
+
+;; https://www.4clojure.com/problem/112
+;; Sequs Horribilis
+;; Create a function which takes an integer and a nested collection of integers
+;; as arguments. Analyze the elements of the input collection and return a
+;; sequence which maintains the nested structure, and which includes all
+;; elements starting from the head whose sum is less than or equal to the input
+;; integer.
+;; This works for Clojure 1.5 and later, but 4clojure is on 1.4
+(fn sequs-h [n xs]
+  (letfn [(reduce-fn [accum item]
+            (let [total (apply + (flatten accum))]
+              (cond (sequential? item)
+                    (conj accum (sequs-h (- n total) item))
+                    (> (+ total item) n)
+                    (reduced accum)
+                    :else
+                    (conj accum item))))]
+    (reduce reduce-fn [] xs)))

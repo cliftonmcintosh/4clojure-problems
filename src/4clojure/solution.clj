@@ -595,11 +595,11 @@
 ;; value of the reduction. Your function must accept either two or three
 ;; arguments, and the return sequence must be lazy.
 (fn reductions'
-  ([f coll] (reductions' f (f (first coll)) (rest coll)))
-  ([f v [h & t]]
-   (lazy-seq (cons v (if (seq t)
-                       (reductions' f (f v h) t)
-                       [(f v h)])))))
+  ([f [head & tail]] (reductions' f (f head) tail))
+  ([f coll [head & tail]]
+   (lazy-seq (cons coll (if (seq tail)
+                          (reductions' f (f coll head) tail)
+                          [(f coll head)])))))
 
 
 ;; http://www.4clojure.com/problem/69

@@ -1214,3 +1214,19 @@
                     :else
                     (conj accum item))))]
     (reduce reduce-fn [] xs)))
+
+;; Answer for 112 that works without reduced by using loop to roll a version of
+;; reduce that terminates.
+(fn sequs-h' [n xs]
+  (loop [accum []
+         ys xs]
+    (let [total (apply + (flatten accum))
+          item (first ys)]
+      (cond (empty? ys)
+            accum
+            (sequential? item)
+            (conj accum (sequs-h' (- n total) item))
+            (> (+ total item) n)
+            accum
+            :else
+            (recur (conj accum item) (rest ys))))))

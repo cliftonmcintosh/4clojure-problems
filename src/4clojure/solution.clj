@@ -1230,3 +1230,45 @@
             accum
             :else
             (recur (conj accum item) (rest ys))))))
+
+
+;; http://www.4clojure.com/problem/82
+;; Word Chains
+;; A word chain consists of a set of words ordered so that each word differs by
+;; only one letter from the words directly before and after it. The one letter
+;; difference can be either an insertion, a deletion, or a substitution. Here is
+;; an example word chain:
+
+;; cat -> cot -> coat -> oat -> hat -> hot -> hog -> dog
+
+;; Write a function which takes a sequence of words, and returns true if they
+;; can be arranged into one continous word chain, and false if they cannot.
+(defn word-chains [ws]
+  (letfn [;; borrowed from https://rosettacode.org/wiki/Levenshtein_distance#Clojure
+          (levenshtein [str1 str2]
+            (let [len1 (count str1)
+                  len2 (count str2)]
+              (cond (zero? len1) len2
+                    (zero? len2) len1
+                    :else
+                    (let [cost (if (= (first str1) (first str2)) 0 1)]
+                      (min (inc (levenshtein (rest str1) str2))
+                           (inc (levenshtein str1 (rest str2)))
+                           (+ cost
+                              (levenshtein (rest str1) (rest str2))))))))
+          ;; borrowed from
+          ;; http://stackoverflow.com/questions/26076077/clojure-list-all-permutations-of-a-list
+          (permutations [s]
+            (lazy-seq
+             (if (seq (rest s))
+               (apply concat (for [x s]
+                               (map (partial cons x)
+                                    (permutations (remove #{x} s)))))
+               [s])))]
+    (->> ws
+         permutations
+         (map (partial partition 2 1))
+         (map (partial map (partial apply levenshtein)))
+         (filter (partial every? (partial = 1)))
+         first
+         boolean)))

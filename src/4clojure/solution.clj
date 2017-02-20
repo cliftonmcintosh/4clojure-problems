@@ -1302,3 +1302,29 @@
            find-best-suit
            (sort-by :rank)
            last))))
+
+
+;; http://www.4clojure.com/problem/91
+;; Graph Connectivity
+;; Given a graph, determine whether the graph is connected. A connected graph is
+;; such that a path exists between any two given nodes.
+;; -Your function must return true if the graph is connected and false
+;; otherwise.
+;; -You will be given a set of tuples representing the edges of a graph. Each
+;; member of a tuple being a vertex/node in the graph.
+;; -Each edge is undirected (can be traversed either direction).
+(defn connected [xs]
+  (loop [visited (conj #{} (first xs))
+         unvisited (rest xs)]
+    (or (= xs visited)
+        (let [node-nums (reduce (fn [accum item]
+                                  (apply conj accum item)) visited)
+              neighbors (filter
+                         (fn [item]
+                           (some #(or (= (first item) %)
+                                      (= (second item) %)) node-nums))
+                         unvisited)]
+          (or (empty? neighbors)
+              false
+              (recur (apply conj visited neighbors)
+                     (remove (apply conj #{} neighbors) unvisited)))))))

@@ -1349,31 +1349,22 @@
 ;; next generation of cells.
 (defn game-of-life [rs]
   (let [row-length (count (first rs))
-        neighbors-fn
-        (fn [r c]
-          (let [p-row (dec r)
-                n-row (inc r)
-                p-column (dec c)
-                n-column (inc c)]
-            (count (filter #(= \# %)
-                           [(get-in rs [p-row p-column])
-                            (get-in rs [p-row c])
-                            (get-in rs [p-row n-column])
-                            (get-in rs [r p-column])
-                            (get-in rs [r n-column])
-                            (get-in rs [n-row p-column])
-                            (get-in rs [n-row c])
-                            (get-in rs [n-row n-column])]))))]
+        neighbors-fn (fn [r c]
+                       (count
+                        (filter #(= \# %)
+                                (for [x (range (dec r) (+ 2 r))
+                                      y (range (dec c) (+ 2 c))]
+                                  (get-in rs [x y])))))]
     (map #(apply str %)
          (partition row-length
                     (for [r (range (count rs))
                           c (range row-length)]
                       (let [cell (get-in rs [r c])
-                            live-neighbors (neighbors-fn r c)
+                            living-neighborhood (neighbors-fn r c)
                             is-live? (= \# cell)]
-                        (cond (and is-live? (<= 2 live-neighbors 3))
+                        (cond (and is-live? (<= 3 living-neighborhood 4))
                               \#
-                              (and (not is-live?) (= 3 live-neighbors))
+                              (and (not is-live?) (= 3 living-neighborhood))
                               \#
                               :else
                               \space)))))))

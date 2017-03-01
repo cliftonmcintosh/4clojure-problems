@@ -1349,11 +1349,11 @@
 ;; next generation of cells.
 (defn game-of-life [rs]
   (let [row-length (count (first rs))
-        neighbors-fn (fn [r c] (count (filter #(= \# %)
+        neighbors-fn (fn [r c] (count (filter (partial = \#)
                                               (for [x (range (dec r) (+ 2 r))
                                                     y (range (dec c) (+ 2 c))]
                                                 (get-in rs [x y])))))]
-    (map #(apply str %)
+    (map (partial apply str)
          (partition row-length
                     (for [r (range (count rs))
                           c (range row-length)]

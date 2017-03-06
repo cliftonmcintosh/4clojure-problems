@@ -13,8 +13,13 @@
                        (apply str))
         head (if (< (Integer/valueOf first-half)
                     (Integer/valueOf last-half))
-               (inc (Integer/valueOf (apply str (take (inc midway) num-str))))
-               (Integer/valueOf (apply str (take (inc midway) num-str))))]
+               (inc (Integer/valueOf (apply str (take
+                                                 (if (even? num-len)
+                                                   midway
+                                                   (inc midway)) num-str))))
+               (Integer/valueOf (apply str (take (if (even? num-len)
+                                                   midway
+                                                   (inc midway))  num-str))))]
     [head (->> head
                str
                (take midway)

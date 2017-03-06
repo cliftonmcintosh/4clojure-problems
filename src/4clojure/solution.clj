@@ -1243,7 +1243,7 @@
 
 ;; Write a function which takes a sequence of words, and returns true if they
 ;; can be arranged into one continous word chain, and false if they cannot.
-(defn word-chains [ws]
+(fn word-chains [ws]
   (letfn [;; borrowed from https://rosettacode.org/wiki/Levenshtein_distance#Clojure
           (levenshtein [str1 str2]
             (let [len1 (count str1)
@@ -1291,7 +1291,7 @@
 ;; one which wins the trick. Cards will be represented in the format returned by
 ;; Problem 128, Recognize Playing Cards: a hash-map of :suit and a numeric
 ;; :rank. Cards with a larger rank are stronger.
-(defn tricky [trump]
+(fn tricky [trump]
   (fn [cards]
     (letfn [(find-best-suit [by-suit]
               (if (and trump (seq (trump by-suit)))
@@ -1313,7 +1313,7 @@
 ;; -You will be given a set of tuples representing the edges of a graph. Each
 ;; member of a tuple being a vertex/node in the graph.
 ;; -Each edge is undirected (can be traversed either direction).
-(defn connected [xs]
+(fn connected [xs]
   (loop [visited (conj #{} (first xs))
          unvisited (rest xs)]
     (or (= xs visited)
@@ -1347,13 +1347,13 @@
 ;; if by reproduction.
 ;; Write a function that accepts a board, and returns a board representing the
 ;; next generation of cells.
-(defn game-of-life [rs]
+(fn game-of-life [rs]
   (let [row-length (count (first rs))
-        neighbors-fn (fn [r c] (count (filter #(= \# %)
+        neighbors-fn (fn [r c] (count (filter (partial = \#)
                                               (for [x (range (dec r) (+ 2 r))
                                                     y (range (dec c) (+ 2 c))]
                                                 (get-in rs [x y])))))]
-    (map #(apply str %)
+    (map (partial apply str)
          (partition row-length
                     (for [r (range (count rs))
                           c (range row-length)]

@@ -1,34 +1,43 @@
 (ns scratch)
 
 (defn next-palindrome [n]
-  (let [num-str (str n)
-        num-len (count num-str)
-        midway (int (/ num-len 2))
-        first-half (->> num-str
-                        (take midway)
-                        reverse
-                        (apply str))
-        last-half (->> num-str
-                       (drop midway)
-                       (apply str))
-        head (if (< (Integer/valueOf first-half)
-                    (Integer/valueOf last-half))
-               (inc (Integer/valueOf (apply str (take
-                                                 (if (even? num-len)
-                                                   midway
-                                                   (inc midway)) num-str))))
-               (Integer/valueOf (apply str (take (if (even? num-len)
-                                                   midway
-                                                   (inc midway))  num-str))))]
-    [head (->> head
-               str
-               (take midway)
-               reverse
-               (apply str))]))
+  (if (> 10 n)
+    (lazy-seq (cons (inc n) (next-palindrome (inc n))))
+    (let [num-str (str n)
+          num-len (count num-str)
+          midway (int (/ num-len 2))
+          first-half (->> num-str
+                          (take midway)
+                          reverse
+                          (apply str))
+          last-half (->> num-str
+                         (drop midway)
+                         (apply str))
+          head (if (<= (Long/valueOf first-half)
+                       (Long/valueOf last-half))
+                 (inc (Long/valueOf (apply str (take
+                                                (if (even? num-len)
+                                                  midway
+                                                  (inc midway)) num-str))))
+                 (Long/valueOf (apply str (take (if (even? num-len)
+                                                  midway
+                                                  (inc midway))  num-str))))
+          current (Long/valueOf (str head (->> head
+                                               str
+                                               (take midway)
+                                               reverse
+                                               (apply str))))]
+      (lazy-seq (cons current (next-palindrome current))))))
 
-(next-palindrome 162)
+(take 2 (next-palindrome 0))
 
-(next-palindrome 1234550000)
+(take 16 (next-palindrome 162))
+
+(take 6 (next-palindrome 1234550000))
+
+(first (next-palindrome (* 111111111 111111111)))
+
+(apply < (take 6666 (next-palindrome 9999999)))
 
 
 ;; def next_palindrome(n):
